@@ -8,8 +8,8 @@ lightDate_mins = 0
 darkDate_hours = 20
 darkDate_mins = 0
 
-lightDate = [15, 15]
-darkDate = [15, 20]
+lightDate = [lightDate_hours, lightDate_mins]
+darkDate = [darkDate_hours, darkDate_mins]
 light_gtk_theme = 'WhiteSur-light'
 light_icon_theme = 'BigSur'
 light_shell_theme = 'WhiteSur-light'
