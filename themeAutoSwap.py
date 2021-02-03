@@ -60,7 +60,7 @@ def update():
         #        os.system(light_shell_theme_command)
         os.system('notify-send "theme changed to light"')
         time.sleep(60)
-    elif nextEvent == darkDate:
+    elif nextEvent() == darkDate:
         #        os.system(dark_gtk_theme_command)
         #        os.system(dark_icon_theme_command)
         #        os.system(dark_shell_theme_command)
