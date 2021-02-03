@@ -1,15 +1,16 @@
 #!usr/bin/python3.8
-from datetime import datetime, date
+from datetime import datetime
 import os
 import time
 
-lightDate_hours = 7
+lightDate_hours = 8
 lightDate_mins = 0
-darkDate_hours = 20
-darkDate_mins = 0
+darkDate_hours = 17
+darkDate_mins = 37
 
-lightDate = [lightDate_hours, lightDate_mins]
-darkDate = [darkDate_hours, darkDate_mins]
+lightDate = lightDate_hours * 60 + lightDate_mins
+darkDate = darkDate_hours * 60 + darkDate_mins
+
 light_gtk_theme = 'WhiteSur-light'
 light_icon_theme = 'BigSur'
 light_shell_theme = 'WhiteSur-light'
@@ -26,48 +27,47 @@ dark_shell_theme_command = 'gsettings set org.gnome.shell.extensions.user-theme 
 
 
 def checkSleepTime():
+    times = nextEvent()
+    nowTimeMin = times[0]
+    nextEventTime = times[1]
+
+    if nextEventTime < nowTimeMin:
+        print('время ожидания: ', 1440 - nowTimeMin + nextEventTime, ' мин')
+        time.sleep((1440 - nowTimeMin + nextEventTime) * 60)
+    else:
+        print('время ожидания: ', nextEventTime - nowTimeMin, ' мин')
+        time.sleep((nextEventTime - nowTimeMin) * 60)
+
+
+def nextEvent():
     nowTime = str(datetime.now())
-    hours = int(nowTime[11:13])
-    min = int(nowTime[14:16])
-    nextEventTime = []
-    if lightDate[0] < darkDate[0]:
+    nextEventTime = lightDate
+    nowTimeMin = int(nowTime[11:13]) * 60 + int(nowTime[14:16])
+    if darkDate > lightDate > nowTimeMin:
         nextEventTime = lightDate
-    elif lightDate[0] == darkDate[0]:
-        if lightDate[1] < darkDate[1]:
-            nextEventTime = lightDate
-        elif lightDate[1] == darkDate[1]:
-            print("TIME ERROR")
-        elif lightDate[1] > darkDate[1]:
-            nextEventTime = darkDate
-    elif lightDate[0] > darkDate[0]:
+    elif lightDate == darkDate:
+        print("TIME ERROR")
+    elif darkDate > nowTimeMin > lightDate:
         nextEventTime = darkDate
-    nextEventTimeMin = nextEventTime[0] * 60 + nextEventTime[1]
-    nowTimeMin = hours * 60 + min  # переводим время в минуты, чтобы посчитать время то следующей смены тем
-    waitingTime = nextEventTimeMin - nowTimeMin
-    if nextEventTimeMin < nowTimeMin:
-        waitingTime += 1440
-    print(waitingTime)
-    return waitingTime * 60
+    return [nowTimeMin, nextEventTime]
 
 
 def update():
-    nowTime = str(datetime.now())
-    hours = int(nowTime[11:13])
-    min = int(nowTime[14:16])
-    nowDate = [hours, min]
-    if nowDate == lightDate:
+    checkSleepTime()
+    if nextEvent() == lightDate:
         #        os.system(light_gtk_theme_command)
         #        os.system(light_icon_theme_command)
         #        os.system(light_shell_theme_command)
         os.system('notify-send "theme changed to light"')
-    elif nowDate == darkDate:
+        time.sleep(60)
+    elif nextEvent == darkDate:
         #        os.system(dark_gtk_theme_command)
         #        os.system(dark_icon_theme_command)
         #        os.system(dark_shell_theme_command)
         os.system('notify-send "theme changed to dark"')
-    print(hours, min)
-    time.sleep(checkSleepTime())
+        time.sleep(60)
     update()
 
 
 update()
+
