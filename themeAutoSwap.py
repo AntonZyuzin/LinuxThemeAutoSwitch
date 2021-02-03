@@ -53,7 +53,6 @@ def nextEvent():
 
 
 def update():
-    checkSleepTime()
     times = nextEvent()
     nextEventTime = times[1]
     if nextEventTime == lightDate:
@@ -68,6 +67,7 @@ def update():
         os.system(dark_shell_theme_command)
         os.system('notify-send "theme changed to dark"')
         time.sleep(60)
+    checkSleepTime()    
     update()
 
 
