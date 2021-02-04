@@ -3,10 +3,10 @@ from datetime import datetime
 import os
 import time
 
-lightDate_hours = 22
-lightDate_mins = 47
-darkDate_hours = 22
-darkDate_mins = 49
+lightDate_hours = 8
+lightDate_mins = 0
+darkDate_hours = 23
+darkDate_mins = 0
 
 lightDate = lightDate_hours * 60 + lightDate_mins
 darkDate = darkDate_hours * 60 + darkDate_mins
@@ -26,6 +26,7 @@ dark_icon_theme_command = 'gsettings set org.gnome.desktop.interface icon-theme 
 dark_shell_theme_command = 'gsettings set org.gnome.shell.extensions.user-theme name "' + dark_shell_theme + '"'
 
 
+
 def checkSleepTime():
     times = nextEvent()
     nowTimeMin, nextEventTime = times[0], times[1]
@@ -38,10 +39,23 @@ def checkSleepTime():
     update(nextEventTime)
 
 
-def nextEvent():
+def nowTheme():
+    if darkDate > realTime() > lightDate:
+        switch(light_gtk_theme_command, light_icon_theme_command, light_shell_theme_command)
+        os.system('notify-send "theme changed to light"')
+
+    else:
+        switch(dark_gtk_theme_command, dark_icon_theme_command, dark_shell_theme_command)
+        os.system('notify-send "theme changed to dark"')
+
+def realTime():
     nowTime = str(datetime.now())
     print(nowTime)
     nowTimeMin = int(nowTime[11:13]) * 60 + int(nowTime[14:16])
+    return nowTimeMin
+
+def nextEvent():
+    nowTimeMin = realTime()
     nextEventTime = lightDate
     if lightDate > nowTimeMin:
         nextEventTime = lightDate
@@ -50,24 +64,25 @@ def nextEvent():
     return [nowTimeMin, nextEventTime]
 
 
+def switch(cmd1, cmd2, cmd3):
+    # os.system(cmd1)
+    # os.system(cmd2)
+    # os.system(cmd3)
+    time.sleep(60)
+
+
 def update(nextEventTime):
     if nextEventTime == lightDate:
-        # os.system(light_gtk_theme_command)
-        # os.system(light_icon_theme_command)
-        # os.system(light_shell_theme_command)
         os.system('notify-send "theme changed to light"')
-        time.sleep(60)
+        switch(light_gtk_theme_command, light_icon_theme_command, light_shell_theme_command)
     elif nextEventTime == darkDate:
-        # os.system(dark_gtk_theme_command)
-        # os.system(dark_icon_theme_command)
-        # os.system(dark_shell_theme_command)
         os.system('notify-send "theme changed to dark"')
-        time.sleep(60)
+        switch(dark_gtk_theme_command, dark_icon_theme_command, dark_shell_theme_command)
     checkSleepTime()
 
 
 if darkDate > lightDate and darkDate != lightDate:
+    nowTheme()
     checkSleepTime()
 else:
     print("TIME ERROR")
-
