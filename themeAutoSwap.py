@@ -2,21 +2,26 @@
 from datetime import datetime
 import os
 import time
+import configparser
 
-lightDate_hours = 8
-lightDate_mins = 0
-darkDate_hours = 23
-darkDate_mins = 0
+
+config = configparser.ConfigParser()
+config.read("settings.ini")
+
+lightDate_hours = int(config.get('Time', 'light_hours'))
+lightDate_mins = int(config.get('Time', 'light_mins'))
+darkDate_hours = int(config.get('Time', 'dark_hours'))
+darkDate_mins = int(config.get('Time', 'dark_mins'))
 
 lightDate = lightDate_hours * 60 + lightDate_mins
 darkDate = darkDate_hours * 60 + darkDate_mins
 
-light_gtk_theme = 'WhiteSur-light'
-light_icon_theme = 'BigSur'
-light_shell_theme = 'WhiteSur-light'
-dark_gtk_theme = 'WhiteSur-dark'
-dark_icon_theme = 'BigSur-black'
-dark_shell_theme = 'WhiteSur-dark'
+light_gtk_theme = config.get('Light_theme', 'gtk_theme')
+light_icon_theme = config.get('Light_theme', 'icon_theme')
+light_shell_theme = config.get('Light_theme', 'shell_theme')
+dark_gtk_theme = config.get('Dark_theme', 'gtk_theme')
+dark_icon_theme = config.get('Dark_theme', 'icon_theme')
+dark_shell_theme = config.get('Dark_theme', 'shell_theme')
 
 light_gtk_theme_command = 'gsettings set org.gnome.desktop.interface gtk-theme "' + light_gtk_theme + '"'
 light_icon_theme_command = 'gsettings set org.gnome.desktop.interface icon-theme "' + light_icon_theme + '"'
@@ -41,12 +46,12 @@ def checkSleepTime():
 
 def nowTheme():
     if darkDate > realTime() > lightDate:
-        switch(light_gtk_theme_command, light_icon_theme_command, light_shell_theme_command)
         os.system('notify-send "theme changed to light"')
+        switch(light_gtk_theme_command, light_icon_theme_command, light_shell_theme_command)
 
     else:
-        switch(dark_gtk_theme_command, dark_icon_theme_command, dark_shell_theme_command)
         os.system('notify-send "theme changed to dark"')
+        switch(dark_gtk_theme_command, dark_icon_theme_command, dark_shell_theme_command)
 
 def realTime():
     nowTime = str(datetime.now())
@@ -68,8 +73,7 @@ def switch(cmd1, cmd2, cmd3):
     # os.system(cmd1)
     # os.system(cmd2)
     # os.system(cmd3)
-    time.sleep(60)
-
+    time.sleep(6)
 
 def update(nextEventTime):
     if nextEventTime == lightDate:
